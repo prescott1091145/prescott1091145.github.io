@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mini Hollow Knight</title>
+<style>
+body {
+  margin: 0;
+  background: black;
+}
+canvas {
+  display: block;
+  margin: auto;
+  background: linear-gradient(#0b0b1a, #000);
+}
+</style>
+</head>
+<body>
+
+<canvas id="game" width="800" height="450"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let gameState = "title"; // title | play | room2
+
+const keys = {};
+addEventListener("keydown", e => keys[e.code] = true);
+addEventListener("keyup", e => keys[e.code] = false);
+
+// PLAYER
+const player = {
+  x: 100, y: 300,
+  w: 26, h: 36,
+  dx: 0, dy: 0,
+  onGround: false,
+  health: 3,
+  soul: 0
+};
+
+const gravity = 0.8;
+let groundY = 380;
+
+// BOSS
+const boss = {
+  x: 520, y: 3
