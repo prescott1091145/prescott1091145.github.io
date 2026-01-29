@@ -23,11 +23,13 @@ canvas {
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-let gameState = "title"; // title | play | room2
+// GAME STATE
+let state = "title"; // title | room1 | room2
 
+// INPUT
 const keys = {};
-addEventListener("keydown", e => keys[e.code] = true);
-addEventListener("keyup", e => keys[e.code] = false);
+window.addEventListener("keydown", e => keys[e.code] = true);
+window.addEventListener("keyup", e => keys[e.code] = false);
 
 // PLAYER
 const player = {
@@ -40,8 +42,145 @@ const player = {
 };
 
 const gravity = 0.8;
-let groundY = 380;
+const groundY = 380;
 
 // BOSS
 const boss = {
-  x: 520, y: 3
+  x: 520, y: 310,
+  w: 70, h: 70,
+  health: 6,
+  alive: true
+};
+
+// RESET
+function startGame() {
+  state = "room1";
+  player.x = 100;
+  player.y = 300;
+  player.health = 3;
+  player.soul = 0;
+  boss.health = 6;
+  boss.alive = true;
+}
+
+// UPDATE
+function update() {
+  if (state === "title") return;
+
+  // Movement
+  if (keys.ArrowLeft) player.dx = -4;
+  else if (keys.ArrowRight) player.dx = 4;
+  else player.dx = 0;
+
+  // Jump
+  if (keys.ArrowUp && player.onGround) {
+    player.dy = -13;
+    player.onGround = false;
+  }
+
+  // Attack
+  if (keys.Space && boss.alive && state === "room1") {
+    if (player.x + player.w + 20 > boss.x &&
+        player.x < boss.x + boss.w) {
+      boss.health--;
+      player.soul = Math.min(player.soul + 20, 100);
+      if (boss.health <= 0) boss.alive = false;
+    }
+  }
+
+  // Physics
+  player.dy += gravity;
+  player.x += player.dx;
+  player.y += player.dy;
+
+  if (player.y + player.h > groundY) {
+    player.y = groundY - player.h;
+    player.dy = 0;
+    player.onGround = true;
+  }
+
+  // Room change
+  if (player.x > canvas.width - 20) {
+    state = "room2";
+    player.x = 20;
+  }
+}
+
+// DRAW
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (state === "title") {
+    ctx.fillStyle = "white";
+    ctx.font = "48px serif";
+    ctx.fillText("MINI HOLLOW KNIGHT", 180, 220);
+    ctx.font = "20px Arial";
+    ctx.fillText("Press ENTER to Start", 310, 270);
+    return;
+  }
+
+  // Background
+  ctx.fillStyle = "#1a1a2e";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Ground
+  ctx.fillStyle = "#2b2b3a";
+  ctx.fillRect(0, groundY, canvas.width, 70);
+
+  // Player
+  ctx.fillStyle = "white";
+  ctx.fillRect(player.x, player.y, player.w, player.h);
+  ctx.fillStyle = "black";
+  ctx.fillRect(player.x + 6, player.y + 10, 4, 4);
+  ctx.fillRect(player.x + 16, player.y + 10, 4, 4);
+
+  // Sword
+  if (keys.Space) {
+    ctx.fillStyle = "#aaa";
+    ctx.fillRect(player.x + player.w, player.y + 16, 22, 4);
+  }
+
+  // Boss
+  if (boss.alive && state === "room1") {
+    ctx.fillStyle = "#7f1d1d";
+    ctx.fillRect(boss.x, boss.y, boss.w, boss.h);
+  }
+
+  // UI — Health masks
+  for (let i = 0; i < player.health; i++) {
+    ctx.fillStyle = "white";
+    ctx.fillRect(20 + i * 22, 20, 18, 14);
+  }
+
+  // UI — SOUL bar
+  ctx.strokeStyle = "white";
+  ctx.strokeRect(20, 45, 100, 10);
+  ctx.fillStyle = "#6ee7ff";
+  ctx.fillRect(20, 45, player.soul, 10);
+
+  // Room text
+  ctx.fillStyle = "white";
+  ctx.font = "16px Arial";
+  ctx.fillText(
+    state === "room1" ? "Forgotten Crossroads" : "Deepnest Passage",
+    320, 30
+  );
+}
+
+// LOOP
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+window.addEventListener("keydown", e => {
+  if (e.code === "Enter" && state === "title") startGame();
+});
+
+loop();
+</script>
+
+</body>
+</html>
+
