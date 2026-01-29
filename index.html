@@ -3,12 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MoneyMonenygames</title>
-
-  <!--
-    This file is 100% compatible with GitHub Pages.
-    Just upload it as index.html to your repository root.
-  -->
+  <title>MoneyMoneyGames</title>
 
   <style>
     * {
@@ -22,6 +17,7 @@
       font-family: Arial, Helvetica, sans-serif;
       background-color: #0b1220;
       color: white;
+      overflow: hidden;
     }
     header {
       height: 60px;
@@ -30,35 +26,43 @@
       align-items: center;
       padding: 0 16px;
       border-bottom: 2px solid #1e293b;
+      z-index: 10;
+      position: relative;
     }
     header h1 {
       margin: 0;
       font-size: 22px;
       font-weight: bold;
     }
-    iframe {
+    .iframe-container {
       width: 100%;
       height: calc(100% - 60px);
+      overflow: hidden;
+      position: relative;
+    }
+    iframe {
+      position: absolute;
+      top: -150px; /* adjust to hide apps/polls */
+      left: 0;
+      width: 100%;
+      height: 130%; /* extend to cover games area */
       border: none;
-      background-color: black;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>MoneyMonenygames</h1>
+    <h1>MoneyMoneyGames</h1>
   </header>
 
-  <!--
-    This iframe loads ALL games directly from HubblePlay.
-    Whatever games exist on their site will appear here.
-  -->
-  <iframe
-    src="https://hubbleplay.github.io/main.html"
-    title="MoneyMonenygames Games"
-    loading="lazy">
-  </iframe>
+  <div class="iframe-container">
+    <iframe
+      src="https://hubbleplay.github.io/main.html"
+      title="MoneyMoneyGames Games"
+      loading="lazy">
+    </iframe>
+  </div>
 
 </body>
 </html>
